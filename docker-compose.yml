@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  golang:
+    build: .
+    container_name: winstonGo
+    restart: always
+    links:
+      - "mysql"
+      - "redis"
+    networks:
+      - web_service
+    working_dir: /go/src/test-package-02
+    volumes:
+      - .:/go/src/test-package-02
+    labels:
+      - "traefik.http.routers.golang.rule=Host(`golang-test-package-02.local.com`)"
+      - "traefik.http.services.golang.loadbalancer.server.port=8080"
+    command: "fresh runner.conf"
+  mysql:
+    image: mysql:5.7
+    container_name: winstonDB
+    restart: always
+    volumes:
+      - /home/winston/DB/test-package-02:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    networks:
+      - web_service
+    labels:
+      - "traefik.http.routers.mysql.rule=Host(`db-test-package-02.local.com`)"
+      - "traefik.http.services.mysql.loadbalancer.server.port=3306"
+  redis:
+    container_name: winstonRedis
+    restart: always
+    image: redis
+
+networks:
+  web_service:
+    external: true
