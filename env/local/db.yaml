@@ -1,0 +1,4 @@
+host: winstonDB
+username: root
+password: root
+database: mydb

@@ -1,8 +1,10 @@
 package database
 
 import (
+	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"test-package-02/app/global"
 	"test-package-02/app/model"
 	"time"
 )
@@ -32,7 +34,7 @@ func (d *dbCon) DBConnect () (*gorm.DB, error){
 		return connectPool, nil
 	}
 
-	dsn := "root:root@(winstonDB:3306)/mydb?charset=utf8&parseTime=True&loc=Local"
+	dsn := composeConfString()
 	connectPool, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -67,4 +69,13 @@ func (d *dbCon) CheckTableIsExist () {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func composeConfString() string {
+	Host := global.Config.Host
+	Username := global.Config.Username
+	Password := global.Config.Password
+	Database := global.Config.Database
+
+	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?timeout=5s&charset=utf8mb4&parseTime=True&loc=Local", Username, Password, Host, Database)
 }
